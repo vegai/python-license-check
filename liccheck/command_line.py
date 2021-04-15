@@ -3,6 +3,7 @@ import collections
 import os.path
 
 from liccheck.requirements import parse_requirements, resolve, resolve_without_deps
+from liccheck.poetry_lock import parse_poetry_lock
 
 try:
     from configparser import ConfigParser, NoOptionError
@@ -113,7 +114,10 @@ def get_packages_info(requirement_file, no_deps=False):
     regex_license = re.compile(r'License: (?P<license>.*)?$', re.M)
     regex_classifier = re.compile(r'Classifier: License(?: :: OSI Approved)?(?: :: (?P<classifier>.*))?$', re.M)
 
-    requirements = parse_requirements(requirement_file)
+    if requirement_file == "poetry.lock":
+        requirements = parse_poetry_lock(requirement_file)
+    else:
+        requirements = parse_requirements(requirement_file)
 
     def transform(dist):
         licenses = get_licenses_from_classifiers(dist) or get_license(dist) or []
